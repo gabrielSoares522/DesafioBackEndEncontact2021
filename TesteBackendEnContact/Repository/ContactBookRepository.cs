@@ -3,6 +3,7 @@ using Dapper.Contrib.Extensions;
 using Microsoft.Data.Sqlite;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using TesteBackendEnContact.Core.Domain.ContactBook;
 using TesteBackendEnContact.Core.Interface.ContactBook;
@@ -36,10 +37,9 @@ namespace TesteBackendEnContact.Repository
         {
             using var connection = new SqliteConnection(databaseConfig.ConnectionString);
 
-            // TODO
-            var sql = "";
-
-            await connection.ExecuteAsync(sql);
+            var sql = new StringBuilder();
+            sql.AppendLine("DELETE FROM ContactBook WHERE Id = @id;");
+            await connection.ExecuteAsync(sql.ToString(), new { id });
         }
 
 
