@@ -12,8 +12,8 @@ Neste teste você poderá mostrar suas habilidades em c# e dotnet, Orientação 
 
 O foco deste teste é a garantia dos requisitos abaixo estejam funcionais na API:
 
-- [ ] Criar, editar, excluir e listar agendas.
-- [ ] Criar, editar, excluir e listar empresas.
+- [x] Criar, editar, excluir e listar agendas.
+- [x] Criar, editar, excluir e listar empresas.
 - [ ] Importar contatos a partir de um arquivo .csv
   - Fique a vontade para definir o leiaute do arquivo .csv
   - Caso dê erro na importação de um registro, não deve impactar a importação dos demais.

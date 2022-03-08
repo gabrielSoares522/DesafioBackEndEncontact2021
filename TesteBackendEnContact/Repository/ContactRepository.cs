@@ -21,10 +21,10 @@ namespace TesteBackendEnContact.Repository
             this.databaseConfig = databaseConfig;
         }
 
-        public async Task<IContact> SaveAsync(IContact company)
+        public async Task<IContact> SaveAsync(IContact contact)
         {
             using var connection = new SqliteConnection(databaseConfig.ConnectionString);
-            var dao = new ContactDao(company);
+            var dao = new ContactDao(contact);
 
             if (dao.Id == 0)
                 dao.Id = await connection.InsertAsync(dao);

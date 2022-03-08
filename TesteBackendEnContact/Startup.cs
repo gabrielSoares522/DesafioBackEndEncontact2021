@@ -39,6 +39,7 @@ namespace TesteBackendEnContact
                     .AddLogging(lb => lb.AddFluentMigratorConsole());
 
             services.AddSingleton(new DatabaseConfig { ConnectionString = Configuration.GetConnectionString("DefaultConnection") });
+            services.AddScoped<IContactRepository, ContactRepository>();
             services.AddScoped<IContactBookRepository, ContactBookRepository>();
             services.AddScoped<ICompanyRepository, CompanyRepository>();
         }

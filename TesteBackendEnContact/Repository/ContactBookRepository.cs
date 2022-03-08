@@ -29,7 +29,7 @@ namespace TesteBackendEnContact.Repository
             if (dao.Id == 0)
                 dao.Id = await connection.InsertAsync(dao);
             else
-                await connection.UpdateAsync(dao); dao.Id = await connection.InsertAsync(dao);
+                await connection.UpdateAsync(dao);
 
             return dao.Export();
         }
@@ -39,6 +39,8 @@ namespace TesteBackendEnContact.Repository
             using var connection = new SqliteConnection(databaseConfig.ConnectionString);
 
             var sql = new StringBuilder();
+            sql.AppendLine("UPDATE Contact SET ContactBookId = null WHERE ContactBookId = @id;");
+            sql.AppendLine("UPDATE Company SET ContactBookId = null WHERE ContactBookId = @id;");
             sql.AppendLine("DELETE FROM ContactBook WHERE Id = @id;");
             await connection.ExecuteAsync(sql.ToString(), new { id });
         }
@@ -82,7 +84,7 @@ namespace TesteBackendEnContact.Repository
         public ContactBookDao(IContactBook contactBook)
         {
             Id = contactBook.Id;
-            Name = Name;
+            Name = contactBook.Name;
         }
 
         public IContactBook Export() => new ContactBook(Id, Name);
