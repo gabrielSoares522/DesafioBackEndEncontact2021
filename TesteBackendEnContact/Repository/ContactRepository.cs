@@ -39,7 +39,6 @@ namespace TesteBackendEnContact.Repository
             using var connection = new SqliteConnection(databaseConfig.ConnectionString);
 
             var sql = new StringBuilder();
-            //sql.AppendLine("UPDATE Contact SET CompanyId = null WHERE CompanyId = @id;");
             sql.AppendLine("DELETE FROM Contact WHERE Id = @id;");
 
             await connection.ExecuteAsync(sql.ToString(), new { id });
@@ -73,7 +72,8 @@ namespace TesteBackendEnContact.Repository
             query += "c.Name AS Name,c.Phone AS Phone,c.Email AS Email,c.Address AS Address";
             query += " FROM Contact c INNER JOIN Company co ON(c.CompanyId = co.Id)";
             query += " WHERE c.Name LIKE '%"+keyWord+"%' or co.name LIKE '%"+keyWord+"%'";
-            query += " OFFSET "+(page-1)*size+" ROWS FETCH NEXT "+size+" ROWS ONLY";
+            query += " ORDER BY c.Id LIMIT "+size+" OFFSET "+ (page - 1) * size;
+
             var result = await connection.QueryAsync<ContactDao>(query);
 
             return result?.Select(item => item.Export());
