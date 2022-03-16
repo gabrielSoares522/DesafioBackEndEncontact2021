@@ -12,6 +12,8 @@ using TesteBackendEnContact.Core.Interface.ContactBook.Contact;
 using TesteBackendEnContact.Repository.Interface;
 using Microsoft.AspNetCore.Hosting;
 using CsvHelper;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace TesteBackendEnContact.Controllers
 {
@@ -48,30 +50,33 @@ namespace TesteBackendEnContact.Controllers
         {
             return await ContactRepository.GetAsync(id);
         }
+
         [HttpPost]
         [Route("uploadCsv")]
         public async Task<IActionResult> UploadCsv(IFormFile file, [FromServices] IContactRepository ContactRepository)
         {
+            List<Contact> contacts = new List<Contact>();
             if (file.FileName.EndsWith(".csv"))
             {
-                List<Contact> contacts = new List<Contact>();
                 using (var sreader = new StreamReader(file.OpenReadStream()))
                 {
                     string[] headers = sreader.ReadLine().Split(',');
                     while (!sreader.EndOfStream)
                     {
                         string[] rows = sreader.ReadLine().Split(',');
-                        int Id = int.Parse(rows[0].ToString());
-                        int ContactBookId = int.Parse(rows[1].ToString());
-                        int CompanyId = int.Parse(rows[2].ToString());
-                        string Name = rows[3].ToString();
-                        string Phone = rows[4].ToString();
-                        string Email = rows[5].ToString();
-                        string Address = rows[6].ToString();
-
-                        Contact contact = new Contact(Id,ContactBookId,CompanyId,Name,Phone,Email,Address);
-                        contacts.Add(contact);
-                        await ContactRepository.SaveAsync(contact);
+                        int Id = 0;
+                        int ContactBookId = int.Parse(rows[0].ToString());
+                        int CompanyId = int.Parse(rows[1].ToString());
+                        string Name = rows[2].ToString();
+                        string Phone = rows[3].ToString();
+                        string Email = rows[4].ToString();
+                        string Address = rows[5].ToString();
+                        try
+                        {
+                            Contact contact = new Contact(Id, ContactBookId, CompanyId, Name, Phone, Email, Address);
+                            await ContactRepository.SaveAsync(contact);
+                            contacts.Add(contact);
+                        } catch (Exception ex) { }
                     }
                 }
             }
@@ -79,8 +84,22 @@ namespace TesteBackendEnContact.Controllers
             {
                 return BadRequest("the api only processes .csv files");  
             }
-            return Ok();
-                //ContactRepository.GetAsync(id);
+            return Ok(JsonSerializer.Serialize(contacts));
         }
+
+        [HttpGet]
+        [Route("search/{keyWord}/{page}/{size}")]
+        public async Task<IEnumerable<IContact>> Search(string keyWord,int page,int size,[FromServices] IContactRepository ContactRepository)
+        {
+            return await ContactRepository.GetAsync(keyWord,page,size);
+        }
+
+        [HttpGet]
+        [Route("searchByCompany/{companyId}")]
+        public async Task<IEnumerable<IContact>> SearchByCompany(int companyId,[FromServices] IContactRepository ContactRepository)
+        {
+            return await ContactRepository.GetByCompanyAsync(companyId);
+        }
+
     }
 }

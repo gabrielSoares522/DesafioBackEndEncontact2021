@@ -59,10 +59,34 @@ namespace TesteBackendEnContact.Repository
         {
             using var connection = new SqliteConnection(databaseConfig.ConnectionString);
 
-            var query = "SELECT * FROM Contact where Id = @id";
+            var query = "SELECT * FROM Contact WHERE Id = @id";
             var result = await connection.QuerySingleOrDefaultAsync<ContactDao>(query, new { id });
 
             return result?.Export();
+        }
+
+        public async Task<IEnumerable<IContact>> GetAsync(string keyWord,int page, int size)
+        {
+            using var connection = new SqliteConnection(databaseConfig.ConnectionString);
+
+            var query = "SELECT c.Id as Id, c.ContactBookId AS ContactBookId,c.CompanyId AS CompanyId,";
+            query += "c.Name AS Name,c.Phone AS Phone,c.Email AS Email,c.Address AS Address";
+            query += " FROM Contact c INNER JOIN Company co ON(c.CompanyId = co.Id)";
+            query += " WHERE c.Name LIKE '%"+keyWord+"%' or co.name LIKE '%"+keyWord+"%'";
+            query += " OFFSET "+(page-1)*size+" ROWS FETCH NEXT "+size+" ROWS ONLY";
+            var result = await connection.QueryAsync<ContactDao>(query);
+
+            return result?.Select(item => item.Export());
+        }
+
+        public async Task<IEnumerable<IContact>> GetByCompanyAsync(int CompanyId)
+        {
+            using var connection = new SqliteConnection(databaseConfig.ConnectionString);
+
+            var query = "SELECT * FROM Contact where CompanyId = @CompanyId";
+            var result = await connection.QueryAsync<ContactDao>(query, new { CompanyId });
+
+            return result?.Select(item => item.Export());
         }
     }
 
@@ -73,18 +97,12 @@ namespace TesteBackendEnContact.Repository
         public int Id { get; set; }
         public int ContactBookId { get; set; }
         public string Name { get; set; }
-
         public int CompanyId { get; set; }
-
         public string Phone { get; set; }
-
         public string Email { get; set; }
-
         public string Address { get; set; }
 
-        public ContactDao()
-        {
-        }
+        public ContactDao() { }
 
         public ContactDao(IContact contact)
         {
