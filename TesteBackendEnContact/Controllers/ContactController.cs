@@ -103,12 +103,12 @@ namespace TesteBackendEnContact.Controllers
         [Route("search/{keyWord}/{page}/{size}")]
         public async Task<IEnumerable<IContact>> Search(string keyWord,int page,int size,[FromServices] IContactRepository ContactRepository)
         {
-            if (page < 0)
+            if (page <= 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(page), "Invalid value of page");
             }
 
-            if (size < 0)
+            if (size <= 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(size), "Invalid value of size");
             }
