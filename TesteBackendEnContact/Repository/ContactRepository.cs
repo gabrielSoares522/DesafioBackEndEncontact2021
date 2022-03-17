@@ -26,6 +26,11 @@ namespace TesteBackendEnContact.Repository
             using var connection = new SqliteConnection(databaseConfig.ConnectionString);
             var dao = new ContactDao(contact);
 
+            var company = await connection.QuerySingleOrDefaultAsync<CompanyDao>("SELECT * FROM Company WHERE Id ="+ dao.CompanyId.ToString());
+            
+            if (company == null)
+                dao.CompanyId = null;
+
             if (dao.Id == 0)
                 dao.Id = await connection.InsertAsync(dao);
             else
@@ -96,8 +101,8 @@ namespace TesteBackendEnContact.Repository
         [Key]
         public int Id { get; set; }
         public int ContactBookId { get; set; }
+        public int? CompanyId { get; set; }
         public string Name { get; set; }
-        public int CompanyId { get; set; }
         public string Phone { get; set; }
         public string Email { get; set; }
         public string Address { get; set; }
@@ -108,8 +113,8 @@ namespace TesteBackendEnContact.Repository
         {
             Id = contact.Id;
             ContactBookId = contact.ContactBookId;
-            Name = contact.Name;
             CompanyId = contact.CompanyId;
+            Name = contact.Name;
             Phone = contact.Phone;
             Email = contact.Email;
             Address = contact.Address;

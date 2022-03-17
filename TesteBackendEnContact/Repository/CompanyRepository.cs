@@ -43,7 +43,6 @@ namespace TesteBackendEnContact.Repository
             sql.AppendLine("UPDATE Contact SET CompanyId = null WHERE CompanyId = @id;");
             sql.AppendLine("DELETE FROM Company WHERE Id = @id;");
 
-            //await connection.ExecuteAsync(sql.ToString(), new { id }, transaction);
             await connection.ExecuteAsync(sql.ToString(), new { id });//, transaction);
         }
 

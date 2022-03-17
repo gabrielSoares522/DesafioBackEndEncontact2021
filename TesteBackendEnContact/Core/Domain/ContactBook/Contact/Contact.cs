@@ -1,4 +1,6 @@
-﻿using TesteBackendEnContact.Core.Interface.ContactBook.Contact;
+﻿using System;
+using System.Threading.Tasks;
+using TesteBackendEnContact.Core.Interface.ContactBook.Contact;
 
 namespace TesteBackendEnContact.Core.Domain.ContactBook.Contact
 {
@@ -8,7 +10,7 @@ namespace TesteBackendEnContact.Core.Domain.ContactBook.Contact
 
         public int ContactBookId { get; private set; }
 
-        public int CompanyId { get; private set; }
+        public int? CompanyId { get; private set; }
 
         public string Name { get; private set; }
 
@@ -18,7 +20,7 @@ namespace TesteBackendEnContact.Core.Domain.ContactBook.Contact
 
         public string Address { get; private set; }
 
-        public Contact(int id, int contactBookId,int companyId,string name,string phone,string email,string address)
+        public Contact(int id, int contactBookId,int? companyId,string name,string phone,string email,string address)
         {
             Id = id;
             ContactBookId = contactBookId;
@@ -27,6 +29,11 @@ namespace TesteBackendEnContact.Core.Domain.ContactBook.Contact
             Phone = phone;
             Email = email;
             Address = address;
+        }
+
+        public static explicit operator Contact(Task<IContact> v)
+        {
+            throw new NotImplementedException();
         }
     }
 }

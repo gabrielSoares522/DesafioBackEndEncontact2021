@@ -3,17 +3,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
 using TesteBackendEnContact.Controllers.Models;
 using TesteBackendEnContact.Core.Domain.ContactBook.Contact;
 using TesteBackendEnContact.Core.Interface.ContactBook.Contact;
 using TesteBackendEnContact.Repository.Interface;
-using Microsoft.AspNetCore.Hosting;
-using CsvHelper;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace TesteBackendEnContact.Controllers
 {
@@ -64,17 +60,33 @@ namespace TesteBackendEnContact.Controllers
                     while (!sreader.EndOfStream)
                     {
                         string[] rows = sreader.ReadLine().Split(',');
-                        int Id = 0;
-                        int ContactBookId = int.Parse(rows[0].ToString());
-                        int CompanyId = int.Parse(rows[1].ToString());
-                        string Name = rows[2].ToString();
-                        string Phone = rows[3].ToString();
-                        string Email = rows[4].ToString();
-                        string Address = rows[5].ToString();
+
+                        int Id = 0, ContactBookId;
+                        int? CompanyId;
+                        string Name, Phone, Email, Address;
+
+                        try
+                        {
+                            ContactBookId = int.Parse(rows[0].ToString());
+                            CompanyId = int.Parse(rows[1].ToString());
+                            Name = rows[2].ToString();
+                            Phone = rows[3].ToString();
+                            Email = rows[4].ToString();
+                            Address = rows[5].ToString();
+                        }
+                        catch (Exception ex) {
+                            continue;
+                        }
+
+                        if (ContactBookId == 0 || Name == null || Phone == null || Email == null || Address == null)
+                        {
+                            continue;
+                        }
+
                         try
                         {
                             Contact contact = new Contact(Id, ContactBookId, CompanyId, Name, Phone, Email, Address);
-                            await ContactRepository.SaveAsync(contact);
+                            contact = (Contact)await ContactRepository.SaveAsync(contact);
                             contacts.Add(contact);
                         } catch (Exception ex) { }
                     }
@@ -91,6 +103,16 @@ namespace TesteBackendEnContact.Controllers
         [Route("search/{keyWord}/{page}/{size}")]
         public async Task<IEnumerable<IContact>> Search(string keyWord,int page,int size,[FromServices] IContactRepository ContactRepository)
         {
+            if (page < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(page), "Invalid value of page");
+            }
+
+            if (size < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(size), "Invalid value of size");
+            }
+
             return await ContactRepository.GetAsync(keyWord,page,size);
         }
 

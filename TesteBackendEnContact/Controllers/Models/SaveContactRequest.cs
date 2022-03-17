@@ -10,7 +10,7 @@ namespace TesteBackendEnContact.Controllers.Models
         public int Id { get; set; }
         [Required]
         public int ContactBookId { get; set; }
-        [Required]
+
         public int CompanyId { get; set; }
         [Required]
         [StringLength(50)]
